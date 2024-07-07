@@ -25,6 +25,9 @@ class APBar:
         self.postfix = ""
         self.width = bar_width
 
+    def __len__(self):
+        return self.len
+
     def __iter__(self):
         return self
 
@@ -65,7 +68,10 @@ class APBar:
         self.postfix = "#" + string
 
     def pp(
-        self, percentage: int, timespent: timedelta = None, estimate: timedelta = None
+        self,
+        percentage: int,
+        timespent: timedelta = None,
+        estimate: timedelta = None,
     ):
         """
         Pretty printing
@@ -86,7 +92,7 @@ class APBar:
         percentage_string = f"{percentage:02d}%"
         digits_string = f"({self.step}/{self.len})"
         print(
-            f"\n {self.prefix}{self.barchart()}{percentage_string: <4} {digits_string: <{self.maxdigits}}{time_string}  {self.postfix} ",
+            f"\n{datetime.now().strftime('%Y.%m.%d %H:%M:%S')}| {self.prefix}{self.barchart()}{percentage_string: <4} {digits_string: <{self.maxdigits}}{time_string}  {self.postfix} ",
             end="",
         )
 
@@ -105,7 +111,11 @@ class APBar:
             estimate = totaltime - timespent
             if progress >= self.last + self.sensitivity:
                 self.last = progress
-                self.pp(percentage=progress, timespent=timespent, estimate=estimate)
+                self.pp(
+                    percentage=progress,
+                    timespent=timespent,
+                    estimate=estimate,
+                )
             else:
                 print(".", end="")
         if self.step > self.len:
