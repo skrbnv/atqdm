@@ -7,12 +7,12 @@ from numbers import Number
 
 class APBar:
     def __init__(
-        self, iterable, period: int = 10, sensitivity: int = 1, bar_width: int = 10
+        self, iterable, period: int = 60, sensitivity: int = 1, bar_width: int = 10
     ) -> None:
         """
         Class constructor
          - iterable
-         - period: 10, time between updates in seconds
+         - period: 60, time between updates in seconds
          - sensitivity: 1, minimum difference vs previous progress to show
          - bar_width: 10, width of the progress bar pseudographics
         """
@@ -168,9 +168,14 @@ class APBar:
         return next(self.iter)
 
 
-def tqdm(iterable):
+def tqdm(iterable, period: int = 60, sensitivity: int = 1, bar_width: int = 10):
     """
-    Function to create instance of a APBar class
+    tqdm selector function. Returns regular tqdm if no running wandb or comet ml instances detected, otherwise returns custom status bar with less frequent updates
+    Arguments
+        - iterable
+        - period: 60, time between updates in seconds
+        - sensitivity: 1, minimum difference vs previous progress to show
+        - bar_width: 10, width of the progress bar pseudographics
     """
     try:
         if (
@@ -179,9 +184,14 @@ def tqdm(iterable):
             and sys.modules["wandb"].run is not None
         ) or (
             "comet_ml" in sys.modules
-            and sys.modules["comet_ml"].get_running_experiment() is not None
+            and sys.modules["comet_ml"].get_global_experiment() is not None
         ):
-            return APBar(iterable=iterable)
+            return APBar(
+                iterable=iterable,
+                period=period,
+                sensitivity=sensitivity,
+                bar_width=bar_width,
+            )
     except:
         pass
     return tqdm_original(iterable=iterable)
