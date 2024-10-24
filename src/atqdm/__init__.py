@@ -168,7 +168,7 @@ class APBar:
         return next(self.iter)
 
 
-def tqdm(iterable, period: int = 60, sensitivity: int = 1, bar_width: int = 10):
+def tqdm(*args, period: int = 60, sensitivity: int = 1, bar_width: int = 10, **kwargs):
     """
     tqdm selector function. Returns regular tqdm if no running wandb or comet ml instances detected, otherwise returns custom status bar with less frequent updates
     Arguments
@@ -187,14 +187,20 @@ def tqdm(iterable, period: int = 60, sensitivity: int = 1, bar_width: int = 10):
             and sys.modules["comet_ml"].get_global_experiment() is not None
         ):
             return APBar(
-                iterable=iterable,
+                iterable=args[0],
                 period=period,
                 sensitivity=sensitivity,
                 bar_width=bar_width,
             )
     except:
         pass
-    return tqdm_original(iterable=iterable)
+    if "period" in kwargs:
+        kwargs.pop("period")
+    if "sensitivity" in kwargs:
+        kwargs.pop("sensitivity")
+    if "bar_width" in kwargs:
+        kwargs.pop("bar_width")
+    return tqdm_original(*args, **kwargs)
 
 
 if __name__ == "__main__":
